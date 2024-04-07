@@ -1,7 +1,9 @@
-package com.acme.statusmgr.beans;
+package com.acme.statusmgr.beans.decorators;
 
-public class tempLocationDecorator extends abstractServer {
-    public tempLocationDecorator(ServerStatus passedServer) {
+import com.acme.statusmgr.beans.ServerInterface;
+
+public class TempLocationDecorator extends AbstractServer {
+    public TempLocationDecorator(ServerInterface passedServer) {
         super(passedServer);
     }
 

@@ -1,8 +1,10 @@
-package com.acme.statusmgr.beans;
+package com.acme.statusmgr.beans.decorators;
 
-public class jreVersionDecorator extends abstractServer {
+import com.acme.statusmgr.beans.ServerInterface;
 
-    public jreVersionDecorator(ServerStatus passedServer) {
+public class JreVersionDecorator extends AbstractServer {
+
+    public JreVersionDecorator(ServerInterface passedServer) {
         super(passedServer);
     }
 

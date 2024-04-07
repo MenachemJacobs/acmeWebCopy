@@ -1,9 +1,11 @@
-package com.acme.statusmgr.beans;
+package com.acme.statusmgr.beans.decorators;
 
-class abstractServer implements ServerInterface{
-    ServerStatus passedServer;
+import com.acme.statusmgr.beans.ServerInterface;
 
-    public abstractServer(ServerStatus passedServer){
+class AbstractServer implements ServerInterface {
+    ServerInterface passedServer;
+
+    public AbstractServer(ServerInterface passedServer){
         this.passedServer = passedServer;
     }
 

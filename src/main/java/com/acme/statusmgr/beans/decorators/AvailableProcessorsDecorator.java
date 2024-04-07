@@ -1,8 +1,10 @@
-package com.acme.statusmgr.beans;
+package com.acme.statusmgr.beans.decorators;
 
-public class availableProcessorsDecorator extends abstractServer {
+import com.acme.statusmgr.beans.ServerInterface;
 
-    public availableProcessorsDecorator(ServerStatus passedServer) {
+public class AvailableProcessorsDecorator extends AbstractServer {
+
+    public AvailableProcessorsDecorator(ServerInterface passedServer) {
         super(passedServer);
     }
 

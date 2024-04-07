@@ -1,11 +1,15 @@
 package com.acme.statusmgr;
 
+import com.acme.statusmgr.beans.ServerInterface;
 import com.acme.statusmgr.beans.ServerStatus;
+import com.acme.statusmgr.beans.decorators.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,9 +45,7 @@ public class StatusController {
      */
     @RequestMapping("/status")
     public ServerStatus getStatus(@RequestParam(value = "name", defaultValue = "Anonymous") String name) {
-        System.out.println();;
-        return new ServerStatus(counter.incrementAndGet(),
-                String.format(template, name));
+        return new ServerStatus(counter.incrementAndGet(), String.format(template, name));
     }
 
 
@@ -53,21 +55,33 @@ public class StatusController {
      * @param name    optional param identifying the requester
      * @param details optional param with a list of server status details being requested
      * @return a ServerStatus object containing the info to be returned to the requestor
-     *      * @apiNote TODO since Spring picks apart the object returned with Reflection and doesn't care what the return-object's type is, we can change the type of object we return if necessary
+     * @apiNote TODO since Spring picks apart the object returned with Reflection and doesn't care what the return-object's type is, we can change the type of object we return if necessary
      */
     @RequestMapping("/status/detailed")
-    public ServerStatus getDetailedStatus(
-            @RequestParam(value = "name", defaultValue = "Anonymous") String name,
-            @RequestParam List<String> details) {
+    public ServerInterface getDetailedStatus(@RequestParam(value = "name", defaultValue = "Anonymous") String name, @RequestParam List<String> details) {
 
-        ServerStatus detailedStatus = null;
+        ServerInterface detailedStatus = new ServerStatus(counter.incrementAndGet(), String.format(template, name));
 
         if (details != null) {
             Logger logger = LoggerFactory.getLogger("StatusController");
             logger.info("Details were provided: " + Arrays.toString(details.toArray()));
-            //todo Should do something with all these details that were requested
+
+            for (String detail : details) {
+                detailedStatus = decoratorPicker(detailedStatus, detail);
+            }
 
         }
-        return detailedStatus; //todo shouldn't just return null
+        return detailedStatus;
+    }
+
+    ServerInterface decoratorPicker(ServerInterface serverInterface, String detail) {
+        return switch (detail) {
+            case "availableProcessors" -> new AvailableProcessorsDecorator(serverInterface);
+            case "freeJVMMemory" -> new FreeJVMMemoryDecorator(serverInterface);
+            case "totalJVMMemory" -> new TotalJVMMemoryDecorator(serverInterface);
+            case "jreVersion" -> new JreVersionDecorator(serverInterface);
+            case "tempLocation" -> new TempLocationDecorator(serverInterface);
+            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Required request parameter 'details' for method parameter type List is not present");
+        };
     }
 }

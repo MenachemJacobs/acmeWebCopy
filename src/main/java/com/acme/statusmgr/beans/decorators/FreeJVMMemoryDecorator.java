@@ -1,7 +1,9 @@
-package com.acme.statusmgr.beans;
+package com.acme.statusmgr.beans.decorators;
 
-public class freeJVMMemoryDecorator extends abstractServer{
-    public freeJVMMemoryDecorator(ServerStatus passedServer) {
+import com.acme.statusmgr.beans.ServerInterface;
+
+public class FreeJVMMemoryDecorator extends AbstractServer {
+    public FreeJVMMemoryDecorator(ServerInterface passedServer) {
         super(passedServer);
     }
 
