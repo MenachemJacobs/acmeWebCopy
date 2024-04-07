@@ -41,6 +41,7 @@ public class StatusController {
      */
     @RequestMapping("/status")
     public ServerStatus getStatus(@RequestParam(value = "name", defaultValue = "Anonymous") String name) {
+        System.out.println();;
         return new ServerStatus(counter.incrementAndGet(),
                 String.format(template, name));
     }
@@ -64,9 +65,7 @@ public class StatusController {
         if (details != null) {
             Logger logger = LoggerFactory.getLogger("StatusController");
             logger.info("Details were provided: " + Arrays.toString(details.toArray()));
-
             //todo Should do something with all these details that were requested
-
 
         }
         return detailedStatus; //todo shouldn't just return null
