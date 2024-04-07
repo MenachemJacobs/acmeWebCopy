@@ -3,6 +3,7 @@ package com.acme.statusmgr.beans.decorators;
 import com.acme.statusmgr.beans.ServerInterface;
 
 public class TotalJVMMemoryDecorator extends AbstractServer {
+
     public TotalJVMMemoryDecorator(ServerInterface passedServer) {
         super(passedServer);
     }
