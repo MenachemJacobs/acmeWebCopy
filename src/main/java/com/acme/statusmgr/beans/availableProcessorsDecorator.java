@@ -1,6 +1,6 @@
 package com.acme.statusmgr.beans;
 
-public class availableProcessorsDecorator extends abstractServer{
+public class availableProcessorsDecorator extends abstractServer {
 
     public availableProcessorsDecorator(ServerStatus passedServer) {
         super(passedServer);
