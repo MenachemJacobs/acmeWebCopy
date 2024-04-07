@@ -1,8 +1,6 @@
 package com.acme.statusmgr.beans;
 
 public interface DetailsFacadeInterface {
-    ServerInterface myServer = new ServerStatus();
-
     int getAvailableProcessors();
     long getFreeJVMMemory();
     long getTotalJVMMemory();

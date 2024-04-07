@@ -1,5 +1,6 @@
 package com.acme.statusmgr;
 
+import com.acme.statusmgr.beans.DetailsFacade;
 import com.acme.statusmgr.beans.ServerInterface;
 import com.acme.statusmgr.beans.ServerStatus;
 import com.acme.statusmgr.beans.decorators.*;
@@ -58,9 +59,10 @@ public class StatusController {
      * @apiNote TODO since Spring picks apart the object returned with Reflection and doesn't care what the return-object's type is, we can change the type of object we return if necessary
      */
     @RequestMapping("/status/detailed")
-    public ServerInterface getDetailedStatus(@RequestParam(value = "name", defaultValue = "Anonymous") String name, @RequestParam (name = "details", required = false) List<String> details) {
+    public ServerInterface getDetailedStatus(@RequestParam(value = "name", defaultValue = "Anonymous") String name,
+                                             @RequestParam (name = "details", required = false) List<String> details) {
 
-        ServerInterface detailedStatus = new ServerStatus(counter.incrementAndGet(), String.format(template, name));
+        ServerInterface detailedStatus = new ServerStatus(counter.incrementAndGet(), String.format(template, name), new DetailsFacade());
 
         if (details != null) {
             Logger logger = LoggerFactory.getLogger("StatusController");

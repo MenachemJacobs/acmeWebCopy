@@ -16,7 +16,7 @@ public class DetailsFacade implements DetailsFacadeInterface {
 
     @Override
     public long getTotalJVMMemory() {
-        return 0;
+        return Runtime.getRuntime().totalMemory();
     }
 
     @Override

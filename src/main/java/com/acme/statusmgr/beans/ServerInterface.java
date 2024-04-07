@@ -8,4 +8,6 @@ public interface ServerInterface {
     String getStatusDesc();
 
     Integer getRequestCost();
+
+    DetailsFacadeInterface provideDetailsFacade();
 }

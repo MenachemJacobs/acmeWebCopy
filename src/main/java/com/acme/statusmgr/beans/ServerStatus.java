@@ -8,6 +8,8 @@ import com.acme.servermgr.ServerManager;
 public class ServerStatus implements ServerInterface {
     private long id;                // Unique identifier of request, sequential number
     private String contentHeader;   // Some info about the request
+    private DetailsFacadeInterface detailsFacade = new DetailsFacade();
+
     /**
      * requestCost constant will have to be changed if we change costs or calc dynamically
      */
@@ -25,8 +27,10 @@ public class ServerStatus implements ServerInterface {
         this.contentHeader = contentHeader;
     }
 
-    public ServerStatus() {
-
+    public ServerStatus(long id, String contentHeader, DetailsFacadeInterface detailsFacade) {
+        this.id = id;
+        this.contentHeader = contentHeader;
+        this.detailsFacade = detailsFacade;
     }
 
     /**
@@ -47,6 +51,10 @@ public class ServerStatus implements ServerInterface {
     @Override
     public String getContentHeader() {
         return contentHeader;
+    }
+
+    public DetailsFacadeInterface provideDetailsFacade() {
+        return detailsFacade;
     }
 
     /**
