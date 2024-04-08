@@ -24,9 +24,17 @@ import java.util.concurrent.atomic.AtomicLong;
  * a param of 'name' specifies a requestor name to appear in response
  * <p>
  * Examples:
- * <a href="http://localhost:8080/server/status">...</a>
+ * <a href="http://localhost:8080/server/status">Default Page</a>
  * <p>
- * <a href="http://localhost:8080/server/status?name=Noach">...</a>
+ * <a href="http://localhost:8080/server/status?name=Noach">Default with name</a>
+ * <p>
+ * You can include an optional 'details' parameter with a list of server status details being requested.
+ * <p>
+ * Examples:
+ * <a href="http://localhost:8080/server/status/detailed?details=availableProcessors">Detailed Processors</a>
+ * <p>
+ * <a href="http://localhost:8080/server/status/detailed?name=Noach&details=availableProcessors,freeJVMMemory">Name and Full Details</a>
+ * </p>
  */
 @RestController
 @RequestMapping("/server")
@@ -59,8 +67,8 @@ public class StatusController {
      */
     @RequestMapping("/status/detailed")
     public ServerInterface getDetailedStatus(@RequestParam(value = "name", defaultValue = "Anonymous") String name,
-                                             @RequestParam (name = "details", required = false) List<String> details) {
-        DetailsFacadeInterface myFacade = isTest ? new MockDetailsFacade(): new DetailsFacade();
+                                             @RequestParam(name = "details", required = false) List<String> details) {
+        DetailsFacadeInterface myFacade = isTest ? new MockDetailsFacade() : new DetailsFacade();
 
         ServerInterface detailedStatus = new ServerStatus(counter.incrementAndGet(), String.format(template, name), myFacade);
 
@@ -72,7 +80,8 @@ public class StatusController {
                 detailedStatus = decoratorPicker(detailedStatus, detail);
             }
 
-        } else throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Required request parameter 'details' for method parameter type List is not present");
+        } else
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Required request parameter 'details' for method parameter type List is not present");
 
         return detailedStatus;
     }
@@ -84,7 +93,8 @@ public class StatusController {
             case "totalJVMMemory" -> new TotalJVMMemoryDecorator(serverInterface);
             case "jreVersion" -> new JreVersionDecorator(serverInterface);
             case "tempLocation" -> new TempLocationDecorator(serverInterface);
-            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid details option: noSuchDetail");
+            default ->
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid details option: noSuchDetail");
         };
     }
 
