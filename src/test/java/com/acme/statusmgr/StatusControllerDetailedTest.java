@@ -15,7 +15,6 @@
  */
 package com.acme.statusmgr;
 
-import com.acme.statusmgr.beans.MockDetailsFacade;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

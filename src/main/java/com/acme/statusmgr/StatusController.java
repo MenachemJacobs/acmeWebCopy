@@ -1,11 +1,13 @@
 package com.acme.statusmgr;
 
 import com.acme.statusmgr.beans.*;
+import com.acme.statusmgr.beans.Facades.DetailsFacade;
+import com.acme.statusmgr.beans.Facades.DetailsFacadeInterface;
+import com.acme.statusmgr.beans.Facades.MockDetailsFacade;
 import com.acme.statusmgr.beans.decorators.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,9 +27,17 @@ import java.util.concurrent.atomic.AtomicLong;
  * a param of 'name' specifies a requestor name to appear in response
  * <p>
  * Examples:
- * http://localhost:8080/server/status
+ * <a href="http://localhost:8080/server/status">Default Page</a>
  * <p>
- * http://localhost:8080/server/status?name=Noach
+ * <a href="http://localhost:8080/server/status?name=Noach">Default with name</a>
+ * <p>
+ * You can include an optional 'details' parameter with a list of server status details being requested.
+ * <p>
+ * Examples:
+ * <a href="http://localhost:8080/server/status/detailed?details=availableProcessors">Detailed Processors</a>
+ * <p>
+ * <a href="http://localhost:8080/server/status/detailed?name=Noach&details=availableProcessors,freeJVMMemory">Name and Full Details</a>
+ * </p>
  */
 @RestController
 @RequestMapping("/server")
@@ -60,32 +70,54 @@ public class StatusController {
      */
     @RequestMapping("/status/detailed")
     public ServerInterface getDetailedStatus(@RequestParam(value = "name", defaultValue = "Anonymous") String name,
-                                             @RequestParam (name = "details", required = false) List<String> details) {
-        DetailsFacadeInterface myFacade = isTest ? new MockDetailsFacade(): new DetailsFacade();
+                                             @RequestParam(name = "details", required = false) List<String> details) {
+        DetailsFacadeInterface myFacade = isTest ? new MockDetailsFacade() : new DetailsFacade();
 
         ServerInterface detailedStatus = new ServerStatus(counter.incrementAndGet(), String.format(template, name), myFacade);
 
         if (details != null) {
             Logger logger = LoggerFactory.getLogger("StatusController");
-            logger.info("Details were provided: " + Arrays.toString(details.toArray()));
+            logger.info("Details were provided: {}", Arrays.toString(details.toArray()));
 
             for (String detail : details) {
+                logger.info("Processing detail: {}", detail);
                 detailedStatus = decoratorPicker(detailedStatus, detail);
             }
 
-        } else throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Required request parameter 'details' for method parameter type List is not present");
+        } else
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Required request parameter 'details' for method parameter type List is not present");
 
         return detailedStatus;
     }
 
     ServerInterface decoratorPicker(ServerInterface serverInterface, String detail) {
+        Logger logger = LoggerFactory.getLogger("DecoratorPicker");
+
         return switch (detail) {
-            case "availableProcessors" -> new AvailableProcessorsDecorator(serverInterface);
-            case "freeJVMMemory" -> new FreeJVMMemoryDecorator(serverInterface);
-            case "totalJVMMemory" -> new TotalJVMMemoryDecorator(serverInterface);
-            case "jreVersion" -> new JreVersionDecorator(serverInterface);
-            case "tempLocation" -> new TempLocationDecorator(serverInterface);
-            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid details option: noSuchDetail");
+            case "availableProcessors" -> {
+                logger.info("Picking AvailableProcessorsDecorator");
+                yield new AvailableProcessorsDecorator(serverInterface);
+            }
+            case "freeJVMMemory" -> {
+                logger.info("Picking FreeJVMMemoryDecorator");
+                yield new FreeJVMMemoryDecorator(serverInterface);
+            }
+            case "totalJVMMemory" -> {
+                logger.info("Picking TotalJVMMemoryDecorator");
+                yield new TotalJVMMemoryDecorator(serverInterface);
+            }
+            case "jreVersion" -> {
+                logger.info("Picking JreVersionDecorator");
+                yield new JreVersionDecorator(serverInterface);
+            }
+            case "tempLocation" -> {
+                logger.info("Picking TempLocationDecorator");
+                yield new TempLocationDecorator(serverInterface);
+            }
+            default -> {
+                logger.error("Invalid details option: {}", detail);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid details option: " + detail);
+            }
         };
     }
 

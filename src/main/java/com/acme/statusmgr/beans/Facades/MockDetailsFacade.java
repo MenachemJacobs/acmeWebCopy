@@ -1,4 +1,4 @@
-package com.acme.statusmgr.beans;
+package com.acme.statusmgr.beans.Facades;
 
 public class MockDetailsFacade implements DetailsFacadeInterface {
 

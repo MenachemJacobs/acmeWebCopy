@@ -34,6 +34,9 @@ The `name` parameter value overrides the default value of “Anonymous” and is
 *    All start with /server
 *    /status  will give back status of server
 *    an optional param of 'name' specifies a requestor name to appear in response
+* You can now include a 'details' parameter to specify server status elements in the response. The order of elements in the 'details' parameter determines the order of appearance in the response.
+* The 'details' parameter must not be left blank and should include at least one value.
+* 'name' and 'details' may appear in any order in the URL.
 
 **--> What you'll need**
 
