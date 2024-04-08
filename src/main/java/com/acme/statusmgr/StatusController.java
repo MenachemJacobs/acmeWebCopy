@@ -1,6 +1,9 @@
 package com.acme.statusmgr;
 
 import com.acme.statusmgr.beans.*;
+import com.acme.statusmgr.beans.Facades.DetailsFacade;
+import com.acme.statusmgr.beans.Facades.DetailsFacadeInterface;
+import com.acme.statusmgr.beans.Facades.MockDetailsFacade;
 import com.acme.statusmgr.beans.decorators.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,9 +77,10 @@ public class StatusController {
 
         if (details != null) {
             Logger logger = LoggerFactory.getLogger("StatusController");
-            logger.info("Details were provided: " + Arrays.toString(details.toArray()));
+            logger.info("Details were provided: {}", Arrays.toString(details.toArray()));
 
             for (String detail : details) {
+                logger.info("Processing detail: {}", detail);
                 detailedStatus = decoratorPicker(detailedStatus, detail);
             }
 
@@ -87,14 +91,33 @@ public class StatusController {
     }
 
     ServerInterface decoratorPicker(ServerInterface serverInterface, String detail) {
+        Logger logger = LoggerFactory.getLogger("DecoratorPicker");
+
         return switch (detail) {
-            case "availableProcessors" -> new AvailableProcessorsDecorator(serverInterface);
-            case "freeJVMMemory" -> new FreeJVMMemoryDecorator(serverInterface);
-            case "totalJVMMemory" -> new TotalJVMMemoryDecorator(serverInterface);
-            case "jreVersion" -> new JreVersionDecorator(serverInterface);
-            case "tempLocation" -> new TempLocationDecorator(serverInterface);
-            default ->
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid details option: noSuchDetail");
+            case "availableProcessors" -> {
+                logger.info("Picking AvailableProcessorsDecorator");
+                yield new AvailableProcessorsDecorator(serverInterface);
+            }
+            case "freeJVMMemory" -> {
+                logger.info("Picking FreeJVMMemoryDecorator");
+                yield new FreeJVMMemoryDecorator(serverInterface);
+            }
+            case "totalJVMMemory" -> {
+                logger.info("Picking TotalJVMMemoryDecorator");
+                yield new TotalJVMMemoryDecorator(serverInterface);
+            }
+            case "jreVersion" -> {
+                logger.info("Picking JreVersionDecorator");
+                yield new JreVersionDecorator(serverInterface);
+            }
+            case "tempLocation" -> {
+                logger.info("Picking TempLocationDecorator");
+                yield new TempLocationDecorator(serverInterface);
+            }
+            default -> {
+                logger.error("Invalid details option: {}", detail);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid details option: " + detail);
+            }
         };
     }
 
