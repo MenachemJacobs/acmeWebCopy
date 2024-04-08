@@ -1,12 +1,11 @@
 package com.acme.statusmgr;
 
-import com.acme.statusmgr.beans.DetailsFacade;
-import com.acme.statusmgr.beans.ServerInterface;
-import com.acme.statusmgr.beans.ServerStatus;
+import com.acme.statusmgr.beans.*;
 import com.acme.statusmgr.beans.decorators.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,6 +35,7 @@ public class StatusController {
 
     protected static final String template = "Server Status requested by %s";
     protected final AtomicLong counter = new AtomicLong();
+    static boolean isTest = false;
 
     /**
      * Process a request for server status information
@@ -61,8 +61,9 @@ public class StatusController {
     @RequestMapping("/status/detailed")
     public ServerInterface getDetailedStatus(@RequestParam(value = "name", defaultValue = "Anonymous") String name,
                                              @RequestParam (name = "details", required = false) List<String> details) {
+        DetailsFacadeInterface myFacade = isTest ? new MockDetailsFacade(): new DetailsFacade();
 
-        ServerInterface detailedStatus = new ServerStatus(counter.incrementAndGet(), String.format(template, name), new DetailsFacade());
+        ServerInterface detailedStatus = new ServerStatus(counter.incrementAndGet(), String.format(template, name), myFacade);
 
         if (details != null) {
             Logger logger = LoggerFactory.getLogger("StatusController");
@@ -72,7 +73,7 @@ public class StatusController {
                 detailedStatus = decoratorPicker(detailedStatus, detail);
             }
 
-        }
+        } else throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Required request parameter 'details' for method parameter type List is not present");
 
         return detailedStatus;
     }
@@ -84,7 +85,11 @@ public class StatusController {
             case "totalJVMMemory" -> new TotalJVMMemoryDecorator(serverInterface);
             case "jreVersion" -> new JreVersionDecorator(serverInterface);
             case "tempLocation" -> new TempLocationDecorator(serverInterface);
-            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Required request parameter 'details' for method parameter type List is not present");
+            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid details option: noSuchDetail");
         };
+    }
+
+    public static void setSystemInfoFacade(boolean test) {
+        isTest = test;
     }
 }

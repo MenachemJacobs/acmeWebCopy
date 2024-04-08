@@ -15,6 +15,7 @@
  */
 package com.acme.statusmgr;
 
+import com.acme.statusmgr.beans.MockDetailsFacade;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -44,16 +45,18 @@ public class StatusControllerDetailedTest {
      */
     @BeforeAll
     public static void beforeAll() {
-       //todo StatusController.setSystemInfoFacade(null /* todo: Inject appropriate object */);
+        //todo StatusController.setSystemInfoFacade(null /* todo: Inject appropriate object */);
+        StatusController.setSystemInfoFacade(true);
     }
 
 
     /**
      * Tests that the server can handle requests with the "availableProcessors" detail.
+     *
      * @throws Exception if something goes wrong while using the mock server
      */
     @Test
-    public void testAvailableProcessors() throws Exception{
+    public void testAvailableProcessors() throws Exception {
         this.mockMvc.perform(get("/server/status/detailed?details=availableProcessors&name=Yankel"))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("$.contentHeader").value("Server Status requested by Yankel"))
@@ -64,10 +67,11 @@ public class StatusControllerDetailedTest {
 
     /**
      * Tests that the server can handle requests with the "freeJVMMemory" detail.
+     *
      * @throws Exception if something goes wrong while using the mock server
      */
     @Test
-    public void testFreeJvmMemory() throws Exception{
+    public void testFreeJvmMemory() throws Exception {
         this.mockMvc.perform(get("/server/status/detailed?details=freeJVMMemory&name=Yankel"))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("$.contentHeader").value("Server Status requested by Yankel"))
@@ -78,10 +82,11 @@ public class StatusControllerDetailedTest {
 
     /**
      * Tests that the server can handle requests with the "totalJVMMemory" detail.
+     *
      * @throws Exception if something goes wrong while using the mock server
      */
     @Test
-    public void testTotalJvmMemory() throws Exception{
+    public void testTotalJvmMemory() throws Exception {
         this.mockMvc.perform(get("/server/status/detailed?details=totalJVMMemory&name=Yankel"))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("$.contentHeader").value("Server Status requested by Yankel"))
@@ -92,10 +97,11 @@ public class StatusControllerDetailedTest {
 
     /**
      * Tests that the server can handle requests with the "jreVersion" detail.
+     *
      * @throws Exception if something goes wrong while using the mock server
      */
     @Test
-    public void testJreVersion() throws Exception{
+    public void testJreVersion() throws Exception {
         this.mockMvc.perform(get("/server/status/detailed?details=jreVersion&name=Yankel"))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("$.contentHeader").value("Server Status requested by Yankel"))
@@ -107,10 +113,11 @@ public class StatusControllerDetailedTest {
 
     /**
      * Tests that the server can handle requests with the "tempLocation" detail.
+     *
      * @throws Exception if something goes wrong while using the mock server
      */
     @Test
-    public void testTempLocation() throws Exception{
+    public void testTempLocation() throws Exception {
         this.mockMvc.perform(get("/server/status/detailed?details=tempLocation&name=Yankel"))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("$.contentHeader").value("Server Status requested by Yankel"))
@@ -122,6 +129,7 @@ public class StatusControllerDetailedTest {
 
     /**
      * Tests that the server can accept multiple details in one HTTP request.
+     *
      * @throws Exception if something goes wrong while using the mock server
      */
     @Test
@@ -146,6 +154,7 @@ public class StatusControllerDetailedTest {
 
     /**
      * Tests that the server does not accept requests without the details parameter.
+     *
      * @throws Exception if something goes wrong while using the mock server
      */
     @Test
@@ -161,6 +170,7 @@ public class StatusControllerDetailedTest {
     /**
      * Tests that the server throws an error if the caller asked for a detail
      * that doesn't exist.
+     *
      * @throws Exception if something goes wrong while using the mock server
      */
     @Test
@@ -174,6 +184,7 @@ public class StatusControllerDetailedTest {
 
     /**
      * Tests that the server allows multiple requests for the same detail.
+     *
      * @throws Exception if something goes wrong while using the mock server
      */
     @Test
@@ -195,6 +206,7 @@ public class StatusControllerDetailedTest {
 
     /**
      * Tests that details params can come before name
+     *
      * @throws Exception if something goes wrong while using the mock server
      */
     @Test
@@ -208,6 +220,7 @@ public class StatusControllerDetailedTest {
 
     /**
      * Tests that the server allows different/reverse order for details.
+     *
      * @throws Exception if something goes wrong while using the mock server
      */
     @Test
